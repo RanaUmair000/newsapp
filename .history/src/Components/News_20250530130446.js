@@ -18,8 +18,6 @@ const News = (props) => {
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
     const [totalResults, setTotalResutlts] = useState(0);
-    const [hasMore, setHasMore] = useState(true);
-
 
     // document.title = this.capitalize(this.props.category);
 
@@ -59,17 +57,6 @@ const News = (props) => {
         const data = await fetch(url);  
         const parsedData = await data.json();
         setArticles(articles.concat(parsedData.articles));
-
-        setArticles(prevArticles => {
-            const newArticles = prevArticles.concat(parsedData.articles);
-            
-            if (newArticles.length >= parsedData.totalResults) {
-              setHasMore(false);
-            }
-        
-            return newArticles;
-          });
-
         setPage(nextPage);
         setTotalResutlts(parsedData.totalResults);
         console.log("Articles loaded:", articles.length);
@@ -85,7 +72,7 @@ console.log("Total results:", totalResults);
             <InfiniteScroll
                 dataLength={articles.length} 
                 next={fetchData}
-                hasMore={hasMore}
+                hasMore={articles.length <= totalResults}
                 loader={<Loading />}
                 
                 // refreshFunction={this.refresh}
@@ -117,7 +104,7 @@ console.log("Total results:", totalResults);
 
 News.defaultProps = {
     country: 'us',
-    pageSize: 2,
+    pageSize: 4,
     category: 'health',
     totalResults: 0,
     page: 1

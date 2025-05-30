@@ -1,12 +1,12 @@
-import React from 'react'
+import React, { Component } from 'react'
 import loading from './loading.gif';
 
-const Loading = () => {
+export default class Loading extends Component {
+  render() {
     return (
       <div>
         <img style={{ display: 'block', margin: '0 auto' }} src={loading} />
       </div>
     )
+  }
 }
-
-export default Loading;

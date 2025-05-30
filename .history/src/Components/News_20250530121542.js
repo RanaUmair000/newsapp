@@ -7,8 +7,10 @@ import { useState, useEffect } from 'react';
 
 
 
-const News = (props) => {
+const News = () => {
+
     
+
     const capitalize = (text) => {
         if (!text) return '';
         return text.charAt(0).toUpperCase() + text.slice(1);
@@ -17,75 +19,60 @@ const News = (props) => {
     const [articles, setArticles] = useState([]);
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
-    const [totalResults, setTotalResutlts] = useState(0);
-    const [hasMore, setHasMore] = useState(true);
-
 
     // document.title = this.capitalize(this.props.category);
 
 
     const updateData = async () => {
         props.setProgress(10);
-        let url = `https://newsapi.org/v2/top-headlines?country=us&category=${props.category}&apiKey=${props.apiKey}&page=${page}&pageSize=${props.pageSize}`;
+        let url = `https://newsapi.org/v2/top-headlines?country=${props.country}&category=${props.category}&apiKey=${props.apiKey}&page=${page}&pageSize=${props.pageSize}`;
         setLoading(true);
         const data = await fetch(url);
         props.setProgress(30);  
         const parsedData = await data.json();
-        console.log(url);
         props.setProgress(70);
         setArticles(parsedData.articles);
         setLoading(false);
-        setTotalResutlts(parsedData.totalResults);
+        this.setState({totalResults: parsedData.totalResults,});
         props.setProgress(100);
     }
 
     useEffect(() => {
-        updateData();
+        
     }, [])
 
+    const componentDidMount = () => {
+        this.updateData();
+    }
+
     const handleNextButton = async () => {
-        setPage(page+1);
-        updateData();
+        this.setState({page: this.state.page+1});
+        this.updateData();
     }
 
     const handlePreviousButton = async () => {
-        setPage(page-1);  
-        updateData();
+        this.setState({page: this.state.page-1});  
+        this.updateData();
     }
 
     const fetchData = async () => {
-        const nextPage = page+1;
-        let url = `https://newsapi.org/v2/top-headlines?country=us&category=${props.category}&apiKey=${props.apiKey}&page=${nextPage}&pageSize=${props.pageSize}`;
+        const nextPage = this.state.page+1;
+        let url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=${this.props.apiKey}&page=${nextPage}&pageSize=${this.props.pageSize}`;
         const data = await fetch(url);  
         const parsedData = await data.json();
-        setArticles(articles.concat(parsedData.articles));
-
-        setArticles(prevArticles => {
-            const newArticles = prevArticles.concat(parsedData.articles);
-            
-            if (newArticles.length >= parsedData.totalResults) {
-              setHasMore(false);
-            }
-        
-            return newArticles;
-          });
-
-        setPage(nextPage);
-        setTotalResutlts(parsedData.totalResults);
-        console.log("Articles loaded:", articles.length);
-console.log("Total results:", totalResults);
+        this.setState({articles: this.state.articles.concat(parsedData.articles), totalResults: parsedData.totalResults, page: nextPage});
     }
 
     return (
       <div>
         <div className='container mt-4'>
-            <h1 className='text-center my-3'>NewsMonkey - Top {capitalize(props.category)} Headlines</h1>
-            {loading && <Loading />} 
-            {!loading && (
+            <h1 className='text-center my-3'>NewsMonkey - Top {this.capitalize(this.props.category)} Headlines</h1>
+            {this.state.loading && <Loading />} 
+            {!this.state.loading && (
             <InfiniteScroll
-                dataLength={articles.length} 
-                next={fetchData}
-                hasMore={hasMore}
+                dataLength={this.state.articles.length} 
+                next={this.fetchData}
+                hasMore={this.state.articles.length < this.state.totalResults}
                 loader={<Loading />}
                 
                 // refreshFunction={this.refresh}
@@ -100,7 +87,7 @@ console.log("Total results:", totalResults);
             >
                 <div className='container'>
                 <div className='row my-3'>
-                    {articles.map((element) => {
+                    {this.state.articles.map((element) => {
                         return <div className='col-md-4 mt-3' key={element.url}>
                             <NewsItem title={element.title !== null?element.title.slice(0, 40):""} description={element.description ? element.description.length > 88 ? element.description.slice(0, 88) + "..." : element.description : ""} imageUrl={element.urlToImage} newsUrl={element.url} date={element.publishedAt} author={element.author} source={element.source.name} />
                         </div>
@@ -117,7 +104,7 @@ console.log("Total results:", totalResults);
 
 News.defaultProps = {
     country: 'us',
-    pageSize: 2,
+    pageSize: 8,
     category: 'health',
     totalResults: 0,
     page: 1
@@ -127,5 +114,3 @@ News.propTypes = {
     country: PropTypes.string,
     pageSize: PropTypes.number
 }
-
-export default News;

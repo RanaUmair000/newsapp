@@ -85,7 +85,7 @@ console.log("Total results:", totalResults);
             <InfiniteScroll
                 dataLength={articles.length} 
                 next={fetchData}
-                hasMore={hasMore}
+                hasMore={articles.length <= totalResults}
                 loader={<Loading />}
                 
                 // refreshFunction={this.refresh}

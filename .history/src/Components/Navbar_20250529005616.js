@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom';
 
-const Navbar = () => {
+export default class Navbar extends Component {
+  render() {
     return (
         <nav className="navbar navbar-expand-lg bg-body-tertiary">
             <div className="container-fluid">
@@ -29,6 +30,5 @@ const Navbar = () => {
             </div>
         </nav>
     )
+  }
 }
-
-export default Navbar;

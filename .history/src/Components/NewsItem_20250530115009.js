@@ -1,7 +1,7 @@
 import React from 'react'
 
-const NewsItem = (props) => {
-    let {title, description, imageUrl, newsUrl, date, author, source} = props;
+const NewsItem = () => {
+    let {title, description, imageUrl, newsUrl, date, author, source} = this.props;
     return (
       <div>
         <div className="card" style={{width: "18rem"}}>

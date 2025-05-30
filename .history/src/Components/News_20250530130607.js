@@ -59,17 +59,6 @@ const News = (props) => {
         const data = await fetch(url);  
         const parsedData = await data.json();
         setArticles(articles.concat(parsedData.articles));
-
-        setArticles(prevArticles => {
-            const newArticles = prevArticles.concat(parsedData.articles);
-            
-            if (newArticles.length >= parsedData.totalResults) {
-              setHasMore(false);
-            }
-        
-            return newArticles;
-          });
-
         setPage(nextPage);
         setTotalResutlts(parsedData.totalResults);
         console.log("Articles loaded:", articles.length);
@@ -85,7 +74,7 @@ console.log("Total results:", totalResults);
             <InfiniteScroll
                 dataLength={articles.length} 
                 next={fetchData}
-                hasMore={hasMore}
+                hasMore={articles.length <= totalResults}
                 loader={<Loading />}
                 
                 // refreshFunction={this.refresh}

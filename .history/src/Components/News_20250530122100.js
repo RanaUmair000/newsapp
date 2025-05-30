@@ -7,8 +7,10 @@ import { useState, useEffect } from 'react';
 
 
 
-const News = (props) => {
+const News = () => {
+
     
+
     const capitalize = (text) => {
         if (!text) return '';
         return text.charAt(0).toUpperCase() + text.slice(1);
@@ -18,24 +20,21 @@ const News = (props) => {
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
     const [totalResults, setTotalResutlts] = useState(0);
-    const [hasMore, setHasMore] = useState(true);
-
 
     // document.title = this.capitalize(this.props.category);
 
 
     const updateData = async () => {
         props.setProgress(10);
-        let url = `https://newsapi.org/v2/top-headlines?country=us&category=${props.category}&apiKey=${props.apiKey}&page=${page}&pageSize=${props.pageSize}`;
+        let url = `https://newsapi.org/v2/top-headlines?country=${props.country}&category=${props.category}&apiKey=${props.apiKey}&page=${page}&pageSize=${props.pageSize}`;
         setLoading(true);
         const data = await fetch(url);
         props.setProgress(30);  
         const parsedData = await data.json();
-        console.log(url);
         props.setProgress(70);
         setArticles(parsedData.articles);
         setLoading(false);
-        setTotalResutlts(parsedData.totalResults);
+        this.setState({totalResults: parsedData.totalResults,});
         props.setProgress(100);
     }
 
@@ -55,25 +54,12 @@ const News = (props) => {
 
     const fetchData = async () => {
         const nextPage = page+1;
-        let url = `https://newsapi.org/v2/top-headlines?country=us&category=${props.category}&apiKey=${props.apiKey}&page=${nextPage}&pageSize=${props.pageSize}`;
+        let url = `https://newsapi.org/v2/top-headlines?country=${props.country}&category=${props.category}&apiKey=${props.apiKey}&page=${nextPage}&pageSize=${props.pageSize}`;
         const data = await fetch(url);  
         const parsedData = await data.json();
         setArticles(articles.concat(parsedData.articles));
-
-        setArticles(prevArticles => {
-            const newArticles = prevArticles.concat(parsedData.articles);
-            
-            if (newArticles.length >= parsedData.totalResults) {
-              setHasMore(false);
-            }
-        
-            return newArticles;
-          });
-
         setPage(nextPage);
         setTotalResutlts(parsedData.totalResults);
-        console.log("Articles loaded:", articles.length);
-console.log("Total results:", totalResults);
     }
 
     return (
@@ -85,7 +71,7 @@ console.log("Total results:", totalResults);
             <InfiniteScroll
                 dataLength={articles.length} 
                 next={fetchData}
-                hasMore={hasMore}
+                hasMore={articles.length < totalResults}
                 loader={<Loading />}
                 
                 // refreshFunction={this.refresh}
@@ -100,7 +86,7 @@ console.log("Total results:", totalResults);
             >
                 <div className='container'>
                 <div className='row my-3'>
-                    {articles.map((element) => {
+                    {this.state.articles.map((element) => {
                         return <div className='col-md-4 mt-3' key={element.url}>
                             <NewsItem title={element.title !== null?element.title.slice(0, 40):""} description={element.description ? element.description.length > 88 ? element.description.slice(0, 88) + "..." : element.description : ""} imageUrl={element.urlToImage} newsUrl={element.url} date={element.publishedAt} author={element.author} source={element.source.name} />
                         </div>
@@ -117,7 +103,7 @@ console.log("Total results:", totalResults);
 
 News.defaultProps = {
     country: 'us',
-    pageSize: 2,
+    pageSize: 8,
     category: 'health',
     totalResults: 0,
     page: 1
@@ -127,5 +113,3 @@ News.propTypes = {
     country: PropTypes.string,
     pageSize: PropTypes.number
 }
-
-export default News;

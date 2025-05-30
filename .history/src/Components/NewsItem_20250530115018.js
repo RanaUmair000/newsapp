@@ -1,6 +1,6 @@
 import React from 'react'
 
-const NewsItem = (props) => {
+const NewsItem = () => {
     let {title, description, imageUrl, newsUrl, date, author, source} = props;
     return (
       <div>
