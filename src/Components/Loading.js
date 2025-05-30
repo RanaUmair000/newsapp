@@ -5,7 +5,7 @@ export default class Loading extends Component {
   render() {
     return (
       <div>
-        <img src={loading} />
+        <img style={{ display: 'block', margin: '0 auto' }} src={loading} />
       </div>
     )
   }
