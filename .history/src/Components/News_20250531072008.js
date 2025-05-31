@@ -1,3 +1,4 @@
+import React from 'react'
 import Loading from './Loading';
 import NewsItem from './NewsItem';
 import PropTypes from 'prop-types';
@@ -38,20 +39,19 @@ const News = (props) => {
         props.setProgress(100);
     }
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         updateData();
-    }, []);
+    }, [])
 
-    // const handleNextButton = async () => {
-    //     setPage(page+1);
-    //     updateData();
-    // }
+    const handleNextButton = async () => {
+        setPage(page+1);
+        updateData();
+    }
 
-    // const handlePreviousButton = async () => {
-    //     setPage(page-1);  
-    //     updateData();
-    // }
+    const handlePreviousButton = async () => {
+        setPage(page-1);  
+        updateData();
+    }
 
     const fetchData = async () => {
         const nextPage = page+1;
