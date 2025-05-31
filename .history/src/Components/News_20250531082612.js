@@ -17,13 +17,13 @@ const News = (props) => {
   const [hasMore, setHasMore] = useState(true);
 
   const updateData = useCallback(async () => {
-    props.setProgress(10);
+    setProgress(10);
     const url = `https://newsapi.org/v2/top-headlines?country=us&category=${props.category}&apiKey=${props.apiKey}&page=${props.page}&pageSize=${props.pageSize}`;
     setLoading(true);
     const data = await fetch(url);
-    props.setProgress(30);
+    setProgress(30);
     const parsedData = await data.json();
-    props.setProgress(70);
+    setProgress(70);
     console.log(url);
   
     if (parsedData.status !== 'ok' || !Array.isArray(parsedData.articles)) {
@@ -36,7 +36,7 @@ const News = (props) => {
     setArticles(parsedData.articles || []);
     setLoading(false);
     setTotalResults(parsedData.totalResults);
-    props.setProgress(100);
+    setProgress(100);
     }, [props.page, props.category, props.apiKey, props.pageSize, props.setProgress]);
 
   useEffect(() => {

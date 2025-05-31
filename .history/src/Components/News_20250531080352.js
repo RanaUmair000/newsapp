@@ -18,26 +18,17 @@ const News = (props) => {
 
   const updateData = useCallback(async () => {
     props.setProgress(10);
-    const url = `https://newsapi.org/v2/top-headlines?country=us&category=${props.category}&apiKey=${props.apiKey}&page=${props.page}&pageSize=${props.pageSize}`;
+    let url = `https://newsapi.org/v2/top-headlines?country=us&category=${props.category}&apiKey=${props.apiKey}&page=${page}&pageSize=${props.pageSize}`;
     setLoading(true);
     const data = await fetch(url);
     props.setProgress(30);
     const parsedData = await data.json();
     props.setProgress(70);
-    console.log(url);
-  
-    if (parsedData.status !== 'ok' || !Array.isArray(parsedData.articles)) {
-      console.error('Error fetching articles:', parsedData);
-      setArticles([]);
-      setHasMore(false);
-      setLoading(false);
-      return;
-    }
-    setArticles(parsedData.articles || []);
+    setArticles(parsedData.articles);
     setLoading(false);
     setTotalResults(parsedData.totalResults);
     props.setProgress(100);
-    }, [props.page, props.category, props.apiKey, props.pageSize, props.setProgress]);
+  }, [page, props]);
 
   useEffect(() => {
     updateData();
@@ -45,10 +36,14 @@ const News = (props) => {
 
   const fetchData = async () => {
     const nextPage = page + 1;
-    console.log('hell');   
     let url = `https://newsapi.org/v2/top-headlines?country=us&category=${props.category}&apiKey=${props.apiKey}&page=${nextPage}&pageSize=${props.pageSize}`;
     const data = await fetch(url);
     const parsedData = await data.json();
+    if (parsedData.status !== "ok") {
+        console.error("API Error:", parsedData.message);
+        setLoading(false);
+        return;
+      }
 
     setArticles(prevArticles => {
       const newArticles = prevArticles.concat(parsedData.articles);
